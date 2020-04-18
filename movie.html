@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <title>Document</title>
+  <style>
+    .card:hover { 
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2); 
+      cursor: pointer;
+    }
+    .imgdetail {
+      position: fixed; 
+      right:10px; 
+      top:10px;
+      bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">     
+    <div class="mt-2 mb-2 ">
+      <h2 class="col-3 offset-3 font-weight-lighter">MOVIE LIST</h2>
+      <div class="input-group mb-3 col-8">
+        <input type="text" class="form-control" placeholder="Search Movie" v-model="query" v-on:keyup.enter="searchMovie()">
+      </div>
+      <div v-show="!moviedata" class="text-center col-8">
+        <h5 class="font-weight-bold alert alert-danger">Unknown movie!</h5>
+      </div>
+      <div class="row p-2">
+        <div class="row col-8" v-show="moviedata">
+          <div class="col-3 mb-2" v-for="(movie, idx) in allmovie" :key="idx">
+            <div style="text-decoration: none; color: black;" class="movie-list" @click.prevent="detail(movie.imdbID)">
+              <div class="card">
+                <img class="card-img-top" :src="movie.Poster" alt="">
+                <div class="card-body">
+                  <span class="card-title" style="font-size:10pt">{{ movie.Title }} - {{ idx }}</span>
+                </div>
+              </div>  
+            </div>
+          </div>
+        </div>
+        <div class="col-4 imgdetail" v-show="moviedata && moviedetaildata">
+          <img class="card-img-top" :src="movieposter" width="300px" height="450px">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ movietitle }}</h5>
+              <p class="card-text text-muted" style="font-size: 10pt;">{{ movieplot }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      data: {
+        query: '',
+        imdbid: '',
+        allmovie: [],
+        moviedata: false,
+        moviedetaildata: false,
+        apikey: 'PUT_YOUR_API',
+        movietitle: '',
+        movieplot: '',
+        movieposter: '',
+      },
+      methods: {
+        searchMovie: function() {
+          var url = 'http://www.omdbapi.com/?apikey=' + this.apikey + '&s=' + this.query;
+          axios.get(url)
+               .then(function(response) {
+                  var dataMovie = response.data.Search;
+                  if(dataMovie != undefined) {
+                    vm.allmovie = dataMovie;
+                    vm.moviedata = true;
+                  } else {
+                    vm.moviedata = !true;
+                  }
+                  console.log(dataMovie, vm.moviedata)
+          });
+        },
+        detail: function(imdbid) {
+          var url = 'http://www.omdbapi.com/?apikey=' + this.apikey + '&i=' + imdbid;
+          console.log(imdbid);
+          vm.moviedetaildata = true;
+          axios.get(url)
+               .then(function (response) {
+                  vm.movietitle = response.data.Title;
+                  vm.movieplot = response.data.Plot;
+                  vm.movieposter = response.data.Poster;
+               });
+        }
+      },
+    });
+  </script>
+</body>
+</html>

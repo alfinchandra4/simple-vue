@@ -1,0 +1,4 @@
+1. register api di http://www.omdbapi.com/apikey.aspx
+2. masukan email, nama, dan kegunaan api movienya
+3. cek di email
+4. buka movie.html, masukan api kalian pada variabel apikey
